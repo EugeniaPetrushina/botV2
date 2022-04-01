@@ -1,8 +1,14 @@
+import json
+from gettext import find
+from io import BytesIO
+
 import bs4
 import telebot
 from telebot import types
 import requests
 from menuBot import Menu
+import DZ
+import BotGames
 
 bot = telebot.TeleBot('5205850102:AAF93gC5k5FoDVQOmZU3BFdN4GkE7rMtZTc')
 
@@ -16,8 +22,7 @@ def start(message, res=False):
 
 def command(message, res=False):
     txt_message = f"Привет, {message.from_user.first_name}! Я тестовый бот для курса программирования на языке Пайтон"
-    bot.send_message(message.chat.id, text=txt_message,
-                     reply_markup=Menu.getMenu("Главное меню").markup)
+    bot.send_message(message.chat.id, text=txt_message, reply_markup=Menu.getMenu("Главное меню").markup)
 
 
 @bot.message_handler(content_types=['text'])
@@ -30,7 +35,6 @@ def get_text_messages(message):
     result = goto_menu(chat_id, ms_text)
     if result == True:
         return
-
     if Menu.cur_menu != None and ms_text in Menu.cur_menu.buttons:
         if ms_text == "Помощь":
             send_help(chat_id)
@@ -51,9 +55,34 @@ def get_text_messages(message):
             if game21.status != None:
                 goto_menu(chat_id, "Выход")
                 return
+            elif ms_text == "Стоп!":
+                game21 = None
+                goto_menu(chat_id, "Выход")
+                return
+
+            elif ms_text == "Задание 1":
+                DZ.dz1(bot, chat_id)
+
+            elif ms_text == "Задание 2":
+                DZ.dz2(bot, chat_id)
+
+            elif ms_text == "Задание 3":
+                DZ.dz3(bot, chat_id)
+
+            elif ms_text == "Задание 4-5":
+                DZ.dz45(bot, chat_id)
+
+            elif ms_text == "Задание 6":
+                DZ.dz6(bot, chat_id)
+        else:
+            bot.send_message(chat_id, text="Извините, я не понимаю вашу команду: " + ms_text)
+            goto_menu(chat_id, "Главное меню")
 
 
 # ----------------------------------------------------------------------------------------------------------------------
+@bot.callback_query_handler(func=lambda call: True)
+def callback_worker(call): # передать параметры
+    pass
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -64,7 +93,16 @@ def goto_menu(chat_id, name_menu):
         target_menu = Menu.getMenu(name_menu)
     if target_menu != None:
         bot.send_message(chat_id, text=target_menu.name, reply_markup=target_menu.markup)
+        if target_menu.name == "Игра в 21":
+            global game21
+            game21 = BotGames.Game21()  # новый экземпляр игры
+            text_game = game21.get_cards(2)  # просим 2 карты
+            bot.send_media_group(chat_id, media=getMediaCards(game21))
+            bot.send_message(chat_id, text=text_game)
 
+        return True
+    else:
+        return False
 
 def getMediaCards(game21):
     medias = []
@@ -122,3 +160,4 @@ def get_dogURL():
 
 # ----------------------------------------------------------------------------------------------------------------------
 bot.polling(none_stop=True, interval=0)
+print()
