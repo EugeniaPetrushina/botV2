@@ -1,4 +1,4 @@
-markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+"""markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
 btn1 = types.KeyboardButton("👋 Главное меню")
 btn2 = types.KeyboardButton("❓ Помощь")
 markup.add(btn1, btn2)
@@ -82,4 +82,4 @@ elif ms_text == "Случайный анекдот":
 else:
     bot.send_message(chat_id, text="Я тебя слышу!!! Ваше сообщение: "
                                    + ms_text)
-
+"""
