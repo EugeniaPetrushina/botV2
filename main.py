@@ -6,23 +6,102 @@ import bs4
 import telebot
 from telebot import types
 import requests
-from menuBot import Menu
+from menuBot import Menu, Users
 import DZ
 import BotGames
 
-bot = telebot.TeleBot('5205850102:AAF93gC5k5FoDVQOmZU3BFdN4GkE7rMtZTc')
+
+bot = telebot.TeleBot('5185233102:AAHj6OgBdQhnpEiBBQhsN-bddiftKYkbBZE')
 
 game21 = None
 
+#команды
 
-@bot.message_handler(commands=["start"])
-def start(message, res=False):
-    chat_id = message.chat.id
-
-
+@bot.message_handler(commands="start")
 def command(message, res=False):
-    txt_message = f"Привет, {message.from_user.first_name}! Я тестовый бот для курса программирования на языке Пайтон"
-    bot.send_message(message.chat.id, text=txt_message, reply_markup=Menu.getMenu("Главное меню").markup)
+    chat_id = message.chat.id
+    bot.send_sticker(chat_id, "CAACAgIAAxkBAAEEkq9iaT_FQTC2XiYqEMXDaZicoSlafQACmxIAAkesoUshgGwRAAF2MPYkBA")
+    txt_message = f"Привет, {message.from_user.first_name}! Я тестовый бот для курса программирования на языке Python"
+    bot.send_message(chat_id, text=txt_message, reply_markup=Menu.getMenu(chat_id, "Главное меню").markup)
+
+#получение
+
+@bot.message_handler(content_types=['sticker'])
+def get_messages(message):
+    chat_id = message.chat.id
+    bot.send_message(chat_id, "Это " + message.content_type)
+
+    sticker = message.sticker
+    bot.send_message(message.chat.id, sticker)
+    # глубокая инспекция объекта
+    # import inspect,pprint
+    # i = inspect.getmembers(sticker)
+    # pprint.pprint(i)
+
+@bot.message_handler(content_types=['audio'])
+def get_messages(message):
+    chat_id = message.chat.id
+    bot.send_message(chat_id, "Это " + message.content_type)
+
+    audio = message.audio
+    bot.send_message(chat_id, audio)
+
+@bot.message_handler(content_types=['voice'])
+def get_messages(message):
+    chat_id = message.chat.id
+    bot.send_message(chat_id, "Это " + message.content_type)
+
+    voice = message.voice
+    bot.send_message(message.chat.id, voice)
+
+@bot.message_handler(content_types=['photo'])
+def get_messages(message):
+    chat_id = message.chat.id
+    bot.send_message(chat_id, "Это " + message.content_type)
+
+    photo = message.photo
+    bot.send_message(message.chat.id, photo)
+
+@bot.message_handler(content_types=['video'])
+def get_messages(message):
+    chat_id = message.chat.id
+    bot.send_message(chat_id, "Это " + message.content_type)
+
+    video = message.video
+    bot.send_message(message.chat.id, video)
+
+@bot.message_handler(content_types=['document'])
+def get_messages(message):
+    chat_id = message.chat.id
+    mime_type = message.document.mime_type
+    bot.send_message(chat_id, "Это " + message.content_type + " (" + mime_type + ")")
+
+    document = message.document
+    bot.send_message(message.chat.id, document)
+    if message.document.mime_type == "video/mp4":
+        bot.send_message(message.chat.id, "This is a GIF!")
+
+@bot.message_handler(content_types=['location'])
+def get_messages(message):
+    chat_id = message.chat.id
+    bot.send_message(chat_id, "Это " + message.content_type)
+
+    location = message.location
+    bot.send_message(message.chat.id, location)
+
+    from Weather import WeatherFromPyOWN
+    pyOWN = WeatherFromPyOWN()
+    bot.send_message(chat_id, pyOWN.getWeatherAtCoords(location.latitude, location.longitude))
+    bot.send_message(chat_id, pyOWN.getWeatherForecastAtCoords(location.latitude, location.longitude))
+
+@bot.message_handler(content_types=['contact'])
+def get_messages(message):
+    chat_id = message.chat.id
+    bot.send_message(chat_id, "Это " + message.content_type)
+
+    contact = message.contact
+    bot.send_message(message.chat.id, contact)
+
 
 
 @bot.message_handler(content_types=['text'])
@@ -158,6 +237,5 @@ def get_dogURL():
     return url
 
 
-# ----------------------------------------------------------------------------------------------------------------------
 bot.polling(none_stop=True, interval=0)
 print()
