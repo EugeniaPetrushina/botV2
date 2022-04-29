@@ -56,7 +56,7 @@ class Menu:
         return id
 
     @classmethod
-    def getMenu(cls, name):
+    def getMenu(cls, chat_id, name):
         menu = cls.hash.get(name)
         if menu != None:
             cls.cur_menu[chat_id] = menu

@@ -169,7 +169,7 @@ def goto_menu(chat_id, name_menu):
     if name_menu == "Выход" and Menu.cur_menu != None and Menu.cur_menu.parent != None:
         target_menu = Menu.cur_menu(not Menu.cur_menu.parent.name)
     else:
-        target_menu = Menu.getMenu(name_menu)
+        target_menu = Menu.getMenu(chat_id, name_menu)
     if target_menu != None:
         bot.send_message(chat_id, text=target_menu.name, reply_markup=target_menu.markup)
         if target_menu.name == "Игра в 21":
