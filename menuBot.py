@@ -29,20 +29,22 @@ class Users:
         return cls.activeUsers.get(chat_id)
 
 class Menu:
-    hash = {}
-    cur_menu = {}
-    extendedParameters = {}
+    hash = {}  # тут будем накапливать все созданные экземпляры класса
+    cur_menu = {}  # тут будет находиться текущий экземпляр класса, текущее меню для каждого пользователя
+    extendedParameters = {}  # это место хранения дополнительных параметров для передачи в inline кнопки
     namePickleFile = "bot_curMenu.plk"
 
+    # ПЕРЕПИСАТЬ для хранения параметров привязанных к chat_id и названию кнопки
     def __init__(self, name, buttons=None, parent=None, handler=None):
         self.parent = parent
         self.name = name
         self.buttons = buttons
         self.handler = handler
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=4)
-        markup.add(*buttons)
+        markup.add(*buttons)  # Обратите внимание - звёздочка используется для распаковки списка
         self.markup = markup
-        self.__class__.hash[name] = self
+        self.__class__.hash[name] = self  # в классе содержится словарь, со всеми экземплярами класса, обновим его
+
 
     @classmethod
     def getExtPar(cls, id):
@@ -64,6 +66,10 @@ class Menu:
         return menu
 
     @classmethod
+    def getCurMenu(cls, chat_id):
+        return cls.cur_menu.get(chat_id)
+
+    @classmethod
     def loadCurMenu(self):
         if os.path.exists(self.namePickleFile):
             with open(self.namePickleFile, 'rb') as pickle_in:
@@ -77,6 +83,7 @@ class Menu:
             pickle.dump(self.cur_menu, pickle_out)
 
 
+# -----------------------------------------------------------------------
 def goto_menu(bot, chat_id, name_menu):
     # получение нужного элемента меню
     cur_menu = Menu.getCurMenu(chat_id)
@@ -91,7 +98,7 @@ def goto_menu(bot, chat_id, name_menu):
     else:
         return None
 
-
+# -----------------------------------------------------------------------
 
 m_main = Menu("Главное меню", buttons=["Развлечения", "Игры", "ДЗ", "Помощь"])
 
@@ -101,6 +108,7 @@ m_game_rsp = Menu("Камень, ножницы, бумага", buttons=["Кам
 
 m_DZ = Menu("ДЗ", buttons=["Задание-1", "Задание-2", "Задание-3", "Задание-4", "Задание-5", "Задание-6", "Выход"], parent=m_main)
 
-m_fun = Menu("Развлечения", buttons=["Прислать собаку", "Прислать анекдот",  "Прислать новости", "Прислать фильм", "Выход"], parent=m_main)
+m_fun = Menu("Развлечения", buttons=["Прислать собаку", "Прислать лису", "Прислать анекдот",  "Прислать новости", "Прислать фильм", "Выход"], parent=m_main)
+# m_fun = Menu("Развлечения", buttons=[["Прислать собаку", "Прислать лису"], ["Прислать анекдот", "Прислать фильм"], ["Выход"]], parent=m_main)
 
 Menu.loadCurMenu()
