@@ -119,13 +119,13 @@ def get_text_messages(message):
     if subMenu != None:
         # Проверим, нет ли обработчика для самого меню. Если есть - выполним нужные команды
         if subMenu.name == "Игра в 21":
-            game21 = botGames.newGame(chat_id, botGames.Game21(jokers_enabled=True))  # создаём новый экземпляр игры
+            game21 = BotGames.newGame(chat_id, BotGames.Game21(jokers_enabled=True))  # создаём новый экземпляр игры
             text_game = game21.get_cards(2)  # просим 2 карты в начале игры
             bot.send_media_group(chat_id, media=getMediaCards(game21))  # получим и отправим изображения карт
             bot.send_message(chat_id, text=text_game)
 
         elif subMenu.name == "Камень, ножницы, бумага":
-            gameRSP = botGames.newGame(chat_id, botGames.GameRPS())  # создаём новый экземпляр игры и регистрируем его
+            gameRSP = BotGames.newGame(chat_id, BotGames.GameRPS())  # создаём новый экземпляр игры и регистрируем его
             text_game = "<b>Победитель определяется по следующим правилам:</b>\n" \
                         "1. Камень побеждает ножницы\n" \
                         "2. Бумага побеждает камень\n" \
@@ -164,7 +164,7 @@ def get_text_messages(message):
 
         # ======================================= реализация игры в 21
         elif ms_text == "Карту!":
-            game21 = botGames.getGame(chat_id)
+            game21 = BotGames.getGame(chat_id)
             if game21 == None:  # если мы случайно попали в это меню, а объекта с игрой нет
                 menuBot.goto_menu(bot, chat_id, "Выход")
                 return
@@ -174,18 +174,18 @@ def get_text_messages(message):
             bot.send_message(chat_id, text=text_game)
 
             if game21.status != None:  # выход, если игра закончена
-                botGames.stopGame(chat_id)
+                BotGames.stopGame(chat_id)
                 menuBot.goto_menu(bot, chat_id, "Выход")
                 return
 
         elif ms_text == "Стоп!":
-            botGames.stopGame(chat_id)
+            BotGames.stopGame(chat_id)
             menuBot.goto_menu(bot, chat_id, "Выход")
             return
 
         # ======================================= реализация игры Камень-ножницы-бумага
-        elif ms_text in botGames.GameRPS.values:
-            gameRSP = botGames.getGame(chat_id)
+        elif ms_text in BotGames.GameRPS.values:
+            gameRSP = BotGames.getGame(chat_id)
             if gameRSP == None:  # если мы случайно попали в это меню, а объекта с игрой нет
                 menuBot.goto_menu(bot, chat_id, "Выход")
                 return
@@ -199,15 +199,15 @@ def get_text_messages(message):
             btn = types.InlineKeyboardButton(text="Создать новую игру", callback_data="GameRPSm|newGame")
             keyboard.add(btn)
             numGame = 0
-            for game in botGames.activeGames.values():
-                if type(game) == botGames.GameRPS_Multiplayer:
+            for game in BotGames.activeGames.values():
+                if type(game) == BotGames.GameRPS_Multiplayer:
                     numGame += 1
                     btn = types.InlineKeyboardButton(text="Игра КНБ-" + str(numGame) + " игроков: " + str(len(game.players)), callback_data="GameRPSm|Join|" + menuBot.Menu.setExtPar(game))
                     keyboard.add(btn)
             btn = types.InlineKeyboardButton(text="Вернуться", callback_data="GameRPSm|Exit")
             keyboard.add(btn)
 
-            bot.send_message(chat_id, text=botGames.GameRPS_Multiplayer.name, reply_markup=types.ReplyKeyboardRemove())
+            bot.send_message(chat_id, text=BotGames.GameRPS_Multiplayer.name, reply_markup=types.ReplyKeyboardRemove())
             bot.send_message(chat_id, "Вы хотите начать новую игру, или присоединиться к существующей?", reply_markup=keyboard)
 
 
