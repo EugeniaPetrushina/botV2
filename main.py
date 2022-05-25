@@ -10,6 +10,8 @@ import menuBot
 from menuBot import Menu, Users
 import DZ
 import BotGames
+import fun
+
 
 
 bot = telebot.TeleBot('5185233102:AAHj6OgBdQhnpEiBBQhsN-bddiftKYkbBZE')
@@ -117,23 +119,6 @@ def get_text_messages(message):
     # проверка = мы нажали кнопку подменю, или кнопку действия
     subMenu = menuBot.goto_menu(bot, chat_id, ms_text)  # попытаемся использовать текст как команду меню, и войти в него
     if subMenu != None:
-        # Проверим, нет ли обработчика для самого меню. Если есть - выполним нужные команды
-        if subMenu.name == "Игра в 21":
-            game21 = BotGames.newGame(chat_id, BotGames.Game21(jokers_enabled=True))  # создаём новый экземпляр игры
-            text_game = game21.get_cards(2)  # просим 2 карты в начале игры
-            bot.send_media_group(chat_id, media=getMediaCards(game21))  # получим и отправим изображения карт
-            bot.send_message(chat_id, text=text_game)
-
-        elif subMenu.name == "Камень, ножницы, бумага":
-            gameRSP = BotGames.newGame(chat_id, BotGames.GameRPS())  # создаём новый экземпляр игры и регистрируем его
-            text_game = "<b>Победитель определяется по следующим правилам:</b>\n" \
-                        "1. Камень побеждает ножницы\n" \
-                        "2. Бумага побеждает камень\n" \
-                        "3. Ножницы побеждают бумагу\n" \
-                        "подробная информация об игре: <a href='https://ru.wikipedia.org/wiki/%D0%9A%D0%B0%D0%BC%D0%B5%D0%BD%D1%8C,_%D0%BD%D0%BE%D0%B6%D0%BD%D0%B8%D1%86%D1%8B,_%D0%B1%D1%83%D0%BC%D0%B0%D0%B3%D0%B0'>Wikipedia</a>"
-            bot.send_photo(chat_id, photo="https://i.ytimg.com/vi/Gvks8_WLiw0/maxresdefault.jpg", caption=text_game,
-                           parse_mode='HTML')
-
         return  # мы вошли в подменю, и дальнейшая обработка не требуется
 
     # проверим, является ли текст текущий команды кнопкой действия
@@ -146,69 +131,15 @@ def get_text_messages(message):
         # ======================================= Развлечения
         elif ms_text == "Прислать собаку":
             bot.send_photo(chat_id, photo=get_dogURL(), caption="Вот тебе собачка!")
-
-        elif ms_text == "Прислать лису":
-            bot.send_photo(chat_id, photo=get_foxURL(), caption="Вот тебе лисичка!")
-
         elif ms_text == "Прислать анекдот":
             bot.send_message(chat_id, text=get_anekdot())
 
         elif ms_text == "Прислать новости":
             bot.send_message(chat_id, text=get_news())
 
-        elif ms_text == "Прислать фильм":
-            send_film(chat_id)
+        elif ms_text == "Прислать игру":
+            send_game(chat_id)
 
-        elif ms_text == "Угадай кто?":
-            get_ManOrNot(chat_id)
-
-        # ======================================= реализация игры в 21
-        elif ms_text == "Карту!":
-            game21 = BotGames.getGame(chat_id)
-            if game21 == None:  # если мы случайно попали в это меню, а объекта с игрой нет
-                menuBot.goto_menu(bot, chat_id, "Выход")
-                return
-
-            text_game = game21.get_cards(1)
-            bot.send_media_group(chat_id, media=getMediaCards(game21))  # получим и отправим изображения карт
-            bot.send_message(chat_id, text=text_game)
-
-            if game21.status != None:  # выход, если игра закончена
-                BotGames.stopGame(chat_id)
-                menuBot.goto_menu(bot, chat_id, "Выход")
-                return
-
-        elif ms_text == "Стоп!":
-            BotGames.stopGame(chat_id)
-            menuBot.goto_menu(bot, chat_id, "Выход")
-            return
-
-        # ======================================= реализация игры Камень-ножницы-бумага
-        elif ms_text in BotGames.GameRPS.values:
-            gameRSP = BotGames.getGame(chat_id)
-            if gameRSP == None:  # если мы случайно попали в это меню, а объекта с игрой нет
-                menuBot.goto_menu(bot, chat_id, "Выход")
-                return
-            text_game = gameRSP.playerChoice(ms_text)
-            bot.send_message(chat_id, text=text_game)
-            gameRSP.newGame()
-
-        # ======================================= реализация игры Камень-ножницы-бумага Multiplayer
-        elif ms_text == "КНБ Multiplayer":
-            keyboard = types.InlineKeyboardMarkup()
-            btn = types.InlineKeyboardButton(text="Создать новую игру", callback_data="GameRPSm|newGame")
-            keyboard.add(btn)
-            numGame = 0
-            for game in BotGames.activeGames.values():
-                if type(game) == BotGames.GameRPS_Multiplayer:
-                    numGame += 1
-                    btn = types.InlineKeyboardButton(text="Игра КНБ-" + str(numGame) + " игроков: " + str(len(game.players)), callback_data="GameRPSm|Join|" + menuBot.Menu.setExtPar(game))
-                    keyboard.add(btn)
-            btn = types.InlineKeyboardButton(text="Вернуться", callback_data="GameRPSm|Exit")
-            keyboard.add(btn)
-
-            bot.send_message(chat_id, text=BotGames.GameRPS_Multiplayer.name, reply_markup=types.ReplyKeyboardRemove())
-            bot.send_message(chat_id, "Вы хотите начать новую игру, или присоединиться к существующей?", reply_markup=keyboard)
 
 
         # ======================================= модуль ДЗ
@@ -250,23 +181,9 @@ def goto_menu(chat_id, name_menu):
         target_menu = Menu.getMenu(chat_id, name_menu)
     if target_menu != None:
         bot.send_message(chat_id, text=target_menu.name, reply_markup=target_menu.markup)
-        if target_menu.name == "Игра в 21":
-            global game21
-            game21 = BotGames.Game21()  # новый экземпляр игры
-            text_game = game21.get_cards(2)  # просим 2 карты
-            bot.send_media_group(chat_id, media=getMediaCards(game21))
-            bot.send_message(chat_id, text=text_game)
-
         return True
     else:
         return False
-
-def getMediaCards(game21):
-    medias = []
-    for url in game21.arr_carda_URL:
-        medias.append(types.InputMediaPhoto(url))
-        return medias
-
 
 def send_help(chat_id):
     global bot
@@ -277,14 +194,27 @@ def send_help(chat_id):
     img = open('кот1.jpg', 'rb')
     bot.send_photo(chat_id, img, reply_markup=markup)
 
-
-def send_film(chat_id):
-    bot.send_message(chat_id, text="еще не готово")
-
-
-def get_ManOrNot(chat_id):
-    bot.send_message(chat_id, text="еще не готово")
-
+def send_game(chat_id):
+    url = "https://store.steampowered.com/explore/random/"
+    req_game = requests.get(url)
+    soup = bs4.BeautifulSoup(req_game.text, "html.parser")
+    prise = ''
+    name = soup.find('div', id="appHubAppName").getText()
+    prise = soup.find('div', class_="game_purchase_price price")
+    if prise == None:
+        prise = ' '
+    else:
+        prise = soup.find('div', class_="game_purchase_price price").getText().strip()
+    developer = soup.find('div', id="developers_list").getText().strip()
+    info = soup.find('div', id="genresAndManufacturer").getText()
+    picture = requests.get(soup.find('img', class_="game_header_image_full"))
+    '''req = requests.get('https://random.dog/woof.json')
+    if req.status_code == 200:
+        r_json = req.json()
+        url = r_json['url']
+    return url'''
+    markup = types.InlineKeyboardMarkup()
+    bot.send_photo(message.chat.id, get(picture).content)
 
 def get_anekdot():
     array_anekdots = []
