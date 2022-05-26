@@ -195,9 +195,11 @@ def send_help(chat_id):
     bot.send_photo(chat_id, img, reply_markup=markup)
 
 def send_game(chat_id):
+
     url = "https://store.steampowered.com/explore/random/"
     req_game = requests.get(url)
     soup = bs4.BeautifulSoup(req_game.text, "html.parser")
+
     prise = ''
     name = soup.find('div', id="appHubAppName").getText()
     prise = soup.find('div', class_="game_purchase_price price")
@@ -206,16 +208,40 @@ def send_game(chat_id):
     else:
         prise = soup.find('div', class_="game_purchase_price price").getText().strip()
     developer = soup.find('div', id="developers_list").getText().strip()
+
+    info_list = []
     info = soup.find('div', id="genresAndManufacturer").getText()
-    picture = soup.find('img', class_="game_header_image_full")
-    '''req = requests.get('https://random.dog/woof.json')
-    if req.status_code == 200:
-        r_json = req.json()
-        url = r_json['url']
-    return url'''
+    info_list=list(info)
+
+    picture_list = []
+    images = soup.find_all('img')
+    for image in images:
+        src = image.get("src")
+        picture_list.append(src)
+    picture=picture_list[6]
+
+    info_list = info.split()
+    i = info_list.index("Title:")
+    info_list[i] = "\nНазвание: "
+    i = info_list.index("Genre:")
+    info_list[i] = "\nЖанр: "
+    i = info_list.index("Developer:")
+    info_list[i] = "\nРазработчик: "
+    i = info_list.index("Publisher:")
+    info_list[i] = "\nИздатель: "
+    i = info_list.index("Release")
+    info_list[i] = "\nДата"
+    i = info_list.index("Date:")
+    info_list[i] = "выхода:"
+    info_list.append("\nЦена: ")
+    info_list.append(prise)
+
+    info = " ".join(info_list)
+
     markup = types.InlineKeyboardMarkup()
-    bot.send_message(chat_id, text=info)
-    bot.send_message(chat_id, text=picture)
+    bot.send_photo(chat_id, photo=picture, caption=info)
+
+
 
 
 def get_anekdot():
