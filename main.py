@@ -207,14 +207,16 @@ def send_game(chat_id):
         prise = soup.find('div', class_="game_purchase_price price").getText().strip()
     developer = soup.find('div', id="developers_list").getText().strip()
     info = soup.find('div', id="genresAndManufacturer").getText()
-    picture = requests.get(soup.find('img', class_="game_header_image_full"))
+    picture = soup.find('img', class_="game_header_image_full")
     '''req = requests.get('https://random.dog/woof.json')
     if req.status_code == 200:
         r_json = req.json()
         url = r_json['url']
     return url'''
     markup = types.InlineKeyboardMarkup()
-    bot.send_photo(message.chat.id, get(picture).content)
+    bot.send_message(chat_id, text=info)
+    bot.send_message(chat_id, text=picture)
+
 
 def get_anekdot():
     array_anekdots = []
