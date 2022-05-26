@@ -209,6 +209,11 @@ def send_game(chat_id):
     info = soup.find('div', id="genresAndManufacturer").getText()
     info_list=list(info)
 
+#ссылка
+    steam = soup.find('div', class_="share share_dialog").getText()
+    steam_url = str(steam)
+    steam_url = steam_url[29:]
+
 #вытащить картинку
     picture_list = []
     images = soup.find_all('img')
@@ -235,10 +240,10 @@ def send_game(chat_id):
     info_list.append(prise)
 
     info = " ".join(info_list)
-
     markup = types.InlineKeyboardMarkup()
-    bot.send_photo(chat_id, photo=picture, caption=info)
-
+    btn1 = types.InlineKeyboardButton(text="Ссылка на игру", url=steam_url)
+    markup.add(btn1)
+    bot.send_photo(chat_id, photo=picture, caption=info, reply_markup=markup)
 
 
 
