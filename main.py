@@ -16,7 +16,6 @@ import fun
 
 bot = telebot.TeleBot('5185233102:AAHj6OgBdQhnpEiBBQhsN-bddiftKYkbBZE')
 
-game21 = None
 
 #команды
 
@@ -36,10 +35,7 @@ def get_messages(message):
 
     sticker = message.sticker
     bot.send_message(message.chat.id, sticker)
-    # глубокая инспекция объекта
-    # import inspect,pprint
-    # i = inspect.getmembers(sticker)
-    # pprint.pprint(i)
+
 
 @bot.message_handler(content_types=['audio'])
 def get_messages(message):
@@ -213,6 +209,7 @@ def send_game(chat_id):
     info = soup.find('div', id="genresAndManufacturer").getText()
     info_list=list(info)
 
+#вытащить картинку
     picture_list = []
     images = soup.find_all('img')
     for image in images:
@@ -220,6 +217,7 @@ def send_game(chat_id):
         picture_list.append(src)
     picture=picture_list[6]
 
+#меняем текст
     info_list = info.split()
     i = info_list.index("Title:")
     info_list[i] = "\nНазвание: "
