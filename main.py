@@ -10,7 +10,7 @@ import menuBot
 from menuBot import Menu, Users
 import DZ
 import BotGames
-import fun
+
 
 
 
@@ -129,12 +129,11 @@ def get_text_messages(message):
             bot.send_photo(chat_id, photo=get_dogURL(), caption="Вот тебе собачка!")
         elif ms_text == "Прислать анекдот":
             bot.send_message(chat_id, text=get_anekdot())
-
-        elif ms_text == "Прислать новости":
-            bot.send_message(chat_id, text=get_news())
-
         elif ms_text == "Прислать игру":
             send_game(chat_id)
+
+        elif ms_text == "Камень, ножницы, бумага, ящерица, Спок":
+            bot.send_message(chat_id, text="но никто не пришел")
 
 
 
@@ -197,7 +196,6 @@ def send_game(chat_id):
     soup = bs4.BeautifulSoup(req_game.text, "html.parser")
 
     prise = ''
-    name = soup.find('div', id="appHubAppName").getText()
     prise = soup.find('div', class_="game_purchase_price price")
     if prise == None:
         prise = ' '
@@ -238,13 +236,22 @@ def send_game(chat_id):
     info_list[i] = "выхода:"
     info_list.append("\nЦена: ")
     info_list.append(prise)
+#отзывы
+    rev = soup.find('div', class_="summary_section").getText()
+    rev_list = str(rev)
+    rev_list = rev_list[18:]
+    rev_list = "\nОтзывы:  " + rev_list
+
+    info_list.append(rev_list)
+
+
+
 
     info = " ".join(info_list)
     markup = types.InlineKeyboardMarkup()
     btn1 = types.InlineKeyboardButton(text="Ссылка на игру", url=steam_url)
     markup.add(btn1)
     bot.send_photo(chat_id, photo=picture, caption=info, reply_markup=markup)
-
 
 
 def get_anekdot():
