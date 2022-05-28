@@ -9,7 +9,8 @@ import requests
 import menuBot
 from menuBot import Menu, Users
 import DZ
-import BotGames
+import gameRSPLS
+import random
 
 
 
@@ -129,11 +130,14 @@ def get_text_messages(message):
             bot.send_photo(chat_id, photo=get_dogURL(), caption="Вот тебе собачка!")
         elif ms_text == "Прислать анекдот":
             bot.send_message(chat_id, text=get_anekdot())
+        elif ms_text == "Создать пароль":
+            bot.send_message(chat_id, text=get_password())
         elif ms_text == "Прислать игру":
             send_game(chat_id)
-
-        elif ms_text == "Камень, ножницы, бумага, ящерица, Спок":
-            bot.send_message(chat_id, text="но никто не пришел")
+        elif ms_text == "Правила КНБЯС":
+            gameRSPLS.info_RSPLS(bot, chat_id)
+        elif ms_text == "Камень" or ms_text == "Ножницы" or ms_text == "Бумага" or ms_text == "Ящерица" or ms_text == "Спок":
+            gameRSPLS.game_RSPLS(bot, chat_id, message)
 
 
 
@@ -166,6 +170,8 @@ def get_text_messages(message):
 @bot.callback_query_handler(func=lambda call: True)
 def callback_worker(call): # передать параметры
     pass
+
+
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -264,7 +270,7 @@ def get_anekdot():
     return array_anekdots[0]
 
 
-def get_fact():
+def get_password():
     array_facts = []
     req_fact = requests.get('https://randstuff.ru/password/')
     soup = bs4.BeautifulSoup(req_fact.text, "html.parser")
