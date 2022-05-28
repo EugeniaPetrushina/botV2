@@ -35,6 +35,8 @@ def game_RSPLS(bot, chat_id, message):
     elif code == "КН" or code == "БК" or code == "БС" or code == "КЯ" or code == "КН" or code == "ЯС" or code == "ЯБ" \
             or code == "СН" or code == "СК" or code == "НБ" or code == "НЯ":
         winner = choices + "Игрок выиграл!"
+
     else:
         winner = choices + "Бот выиграл!"
+
     bot.send_message(chat_id, text=winner)

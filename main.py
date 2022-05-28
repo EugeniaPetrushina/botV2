@@ -11,6 +11,7 @@ from menuBot import Menu, Users
 import DZ
 import gameRSPLS
 import random
+import botGames
 
 
 
@@ -103,7 +104,6 @@ def get_messages(message):
     bot.send_message(message.chat.id, contact)
 
 
-
 @bot.message_handler(content_types=['text'])
 def get_text_messages(message):
     chat_id = message.chat.id
@@ -128,6 +128,8 @@ def get_text_messages(message):
         # ======================================= Развлечения
         elif ms_text == "Прислать собаку":
             bot.send_photo(chat_id, photo=get_dogURL(), caption="Вот тебе собачка!")
+        elif ms_text == "Прислать кошку":
+            bot.send_photo(chat_id, photo=get_catURL(), caption="Вот тебе кошечка!")
         elif ms_text == "Прислать анекдот":
             bot.send_message(chat_id, text=get_anekdot())
         elif ms_text == "Создать пароль":
@@ -138,7 +140,10 @@ def get_text_messages(message):
             gameRSPLS.info_RSPLS(bot, chat_id)
         elif ms_text == "Камень" or ms_text == "Ножницы" or ms_text == "Бумага" or ms_text == "Ящерица" or ms_text == "Спок":
             gameRSPLS.game_RSPLS(bot, chat_id, message)
+        elif ms_text == "Буква":
+            gameW = botGames.getGame(chat_id)
 
+            gameW.botGames.input_letter()
 
 
         # ======================================= модуль ДЗ
@@ -288,6 +293,13 @@ def get_dogURL():
         url = r_json['url']
     return url
 
+def get_catURL():
+    url = ""
+    req = requests.get('https://api.thecatapi.com/v1/images/search')
+    r_json = json.loads(req.text)
+
+    url = r_json['url']
+    return url
 
 bot.polling(none_stop=True, interval=0)
 print()
