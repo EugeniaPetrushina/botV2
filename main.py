@@ -116,6 +116,11 @@ def get_text_messages(message):
     # проверка = мы нажали кнопку подменю, или кнопку действия
     subMenu = menuBot.goto_menu(bot, chat_id, ms_text)  # попытаемся использовать текст как команду меню, и войти в него
     if subMenu != None:
+        if subMenu.name == "Камень, ножницы, бумага, ящерица, Спок":
+            gameRSPLS.info_RSPLS(bot, chat_id)
+        elif subMenu.name == "Виселица":
+            gameW = botGames.newGame(chat_id, botGames.wordGame(bot, chat_id))
+            gameW.startGame()
         return  # мы вошли в подменю, и дальнейшая обработка не требуется
 
     # проверим, является ли текст текущий команды кнопкой действия
@@ -136,16 +141,10 @@ def get_text_messages(message):
             bot.send_message(chat_id, text=get_password())
         elif ms_text == "Прислать игру":
             send_game(chat_id)
-        elif ms_text == "Правила КНБЯС":
-            gameRSPLS.info_RSPLS(bot, chat_id)
         elif ms_text == "Камень" or ms_text == "Ножницы" or ms_text == "Бумага" or ms_text == "Ящерица" or ms_text == "Спок":
             gameRSPLS.game_RSPLS(bot, chat_id, message)
         elif ms_text == "Буква":
-            gameW = botGames.getGame(chat_id)
-
-            gameW.botGames.input_letter()
-
-
+            send_game(chat_id)
         # ======================================= модуль ДЗ
         elif ms_text == "Задание-1":
             DZ.dz1(bot, chat_id)
