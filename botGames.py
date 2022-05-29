@@ -40,7 +40,7 @@ class Word_game:
         self.bot = bot
         self.chat_id = chat_id
         self.word = New_word().get_word
-        self.word_length = len(self.word)
+        self.word_length = len(self.word.split())
         self.lives = 9
         self.used_letters = []
         self.guess_word = ""

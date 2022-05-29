@@ -119,7 +119,7 @@ def get_text_messages(message):
         if subMenu.name == "Камень, ножницы, бумага, ящерица, Спок":
             gameRSPLS.info_RSPLS(bot, chat_id)
         elif subMenu.name == "Виселица":
-            gameW = botGames.newGame(chat_id, botGames.wordGame(bot, chat_id))
+            gameW = botGames.newGame(chat_id, botGames.Word_game(bot, chat_id))
             gameW.startGame()
         return  # мы вошли в подменю, и дальнейшая обработка не требуется
 
@@ -133,8 +133,8 @@ def get_text_messages(message):
         # ======================================= Развлечения
         elif ms_text == "Прислать собаку":
             bot.send_photo(chat_id, photo=get_dogURL(), caption="Вот тебе собачка!")
-        elif ms_text == "Прислать кошку":
-            bot.send_photo(chat_id, photo=get_catURL(), caption="Вот тебе кошечка!")
+        elif ms_text == "Человек и email":
+            get_personURL(chat_id)
         elif ms_text == "Прислать анекдот":
             bot.send_message(chat_id, text=get_anekdot())
         elif ms_text == "Создать пароль":
@@ -292,13 +292,26 @@ def get_dogURL():
         url = r_json['url']
     return url
 
-def get_catURL():
-    url = ""
+def get_personURL(chat_id):
+    """url = ""
     req = requests.get('https://api.thecatapi.com/v1/images/search')
     r_json = json.loads(req.text)
 
     url = r_json['url']
-    return url
+    return url"""
+    url = requests.get("https://jsonplaceholder.typicode.com/users")
+    text = url.text
+
+    data = json.loads(text)
+    people = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    r_people = random.choice(people)
+
+    user = data[int(r_people)]
+    email = user['email']
+    user_info = f"{user['name']}\n" + email
+    bot.send_message(chat_id, text=user_info)
+
+
 
 bot.polling(none_stop=True, interval=0)
 print()
