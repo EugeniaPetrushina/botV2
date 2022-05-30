@@ -40,8 +40,13 @@ def dz6(bot, chat_id):
     sent = bot.send_message(chat_id, text="Введите имя: ")
     bot.register_next_step_handler(sent, f6, bot, chat_id)
 def f6(sent, bot, chat_id):
-    name2 = sent
 
+    name = sent.text
+    name2 = name[::-1]
+    name3 = name[2:6]
+    bot.send_message(chat_id, text=name)
+    bot.send_message(chat_id, text=name2)
+    bot.send_message(chat_id, text=name3)
 
 
 
