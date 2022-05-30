@@ -120,7 +120,7 @@ def get_text_messages(message):
             gameRSPLS.info_RSPLS(bot, chat_id)
         elif subMenu.name == "Виселица":
             gameW = botGames.newGame(chat_id, botGames.Word_game(bot, chat_id))
-            gameW.startGame()
+            gameW.word_start()
         return  # мы вошли в подменю, и дальнейшая обработка не требуется
 
     # проверим, является ли текст текущий команды кнопкой действия
@@ -133,6 +133,8 @@ def get_text_messages(message):
         # ======================================= Развлечения
         elif ms_text == "Прислать собаку":
             bot.send_photo(chat_id, photo=get_dogURL(), caption="Вот тебе собачка!")
+        elif ms_text == "Прислать котика":
+            bot.send_photo(chat_id, photo=get_catURL(), caption="Вот тебе котик!")
         elif ms_text == "Человек и email":
             get_personURL(chat_id)
         elif ms_text == "Прислать анекдот":
@@ -144,7 +146,11 @@ def get_text_messages(message):
         elif ms_text == "Камень" or ms_text == "Ножницы" or ms_text == "Бумага" or ms_text == "Ящерица" or ms_text == "Спок":
             gameRSPLS.game_RSPLS(bot, chat_id, message)
         elif ms_text == "Буква":
-            send_game(chat_id)
+            gameW = botGames.getGame(chat_id)
+            if gameW == None:  # если мы случайно попали в это меню, а объекта с игрой нет
+                menuBot.goto_menu(bot, chat_id, "Выход")
+                return
+            gameW.input_letter()
         # ======================================= модуль ДЗ
         elif ms_text == "Задание-1":
             DZ.dz1(bot, chat_id)
@@ -290,6 +296,14 @@ def get_dogURL():
     if req.status_code == 200:
         r_json = req.json()
         url = r_json['url']
+    return url
+
+def get_catURL():
+    url = ""
+    req = requests.get("https://api.thecatapi.com/v1/images/search")
+    if req.status_code == 200:
+        r_json = req.json()
+        url = r_json[0]["url"]
     return url
 
 def get_personURL(chat_id):
