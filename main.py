@@ -174,11 +174,8 @@ def get_text_messages(message):
         elif ms_text == "Задание-3":
             DZ.dz3(bot, chat_id)
 
-        elif ms_text == "Задание-4":
-            DZ.dz4(bot, chat_id)
-
-        elif ms_text == "Задание-5":
-            DZ.dz5(bot, chat_id)
+        elif ms_text == "Задание-4/5":
+            DZ.dz45(bot, chat_id)
 
         elif ms_text == "Задание-6":
             DZ.dz6(bot, chat_id)
