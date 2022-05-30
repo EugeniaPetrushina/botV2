@@ -40,12 +40,12 @@ class Word_game:
         self.chat_id = chat_id
         self.word = New_word().get_word()
         self.word_length = len(self.word)
-        self.lives = 9
+        self.lives = 3
         self.used_letters = []
         self.guess_word = ""
 
     def word_start(self):
-        self.guess_word = "_ " * self.word_length
+        self.guess_word = "_" * self.word_length
         info_word = "Бот загадывает слово\n" \
                     "Игрок должен угадывать его либо, по одной букве, либо все слово сразу" \
                     "Если игрок называет букву, которое есть в слова, она появляется" \
@@ -83,7 +83,7 @@ class Word_game:
         guess_word = self.guess_word
         word = self.word
         used_letters = self.used_letters
-
+        print(len(playerChoice))
 
         if len(playerChoice) > 1:
             if playerChoice.upper() == word:
@@ -98,17 +98,19 @@ class Word_game:
                         index = word.index(playerChoice, index + 1)
                         guess_word = guess_word[:index] + playerChoice + guess_word[index + 1:]
                 self.guess_word = guess_word
-                used = ', '.join(used_letters)
-        else:
-            self.lives -= 1
-            if self.lives < 0:
-                self.bot.send_message(self.chat_id, f"You lose!!!\n{word}")
-                # restart_game()
+
+                self.used_letters.append(playerChoice)
+                self.bot.send_message(self.chat_id, text=f'{guess_word}\n{used_letters}')
             else:
-                self.used_letters.append(user_input)
-                used = ', '.join(used_letters)
-                text = "❌\n" + "Wrong letters: " + used + "\n" + guess_word + "\n\n" + hearts(self.lives)
-                self.bot.send_message(self.chat_id, text=text)
+                self.lives -= 1
+                if self.lives < 0:
+                    self.bot.send_message(self.chat_id, f"You lose!!!\n{word}")
+                    # restart_game()
+                else:
+                    self.used_letters.append(playerChoice)
+                    text = f"Буквы {playerChoice.upper()} нет в слове\nИспользованные буквы: {self.used_letters}\n\n{guess_word} " \
+                           f"- {self.word_length} букв(ы)\n\nЖизней осталось: {self.lives}"
+                    self.bot.send_message(self.chat_id, text=text)
 
 
 

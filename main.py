@@ -151,6 +151,9 @@ def get_text_messages(message):
                 menuBot.goto_menu(bot, chat_id, "Выход")
                 return
             gameW.input_letter()
+        elif ms_text == "Загадать слово":
+            gameW = botGames.newGame(chat_id, botGames.Word_game(bot, chat_id))
+            gameW.word_start()
         # ======================================= модуль ДЗ
         elif ms_text == "Задание-1":
             DZ.dz1(bot, chat_id)
