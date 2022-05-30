@@ -145,15 +145,25 @@ def get_text_messages(message):
             send_game(chat_id)
         elif ms_text == "Камень" or ms_text == "Ножницы" or ms_text == "Бумага" or ms_text == "Ящерица" or ms_text == "Спок":
             gameRSPLS.game_RSPLS(bot, chat_id, message)
-        elif ms_text == "Буква":
+        elif ms_text == "Попытка":
             gameW = botGames.getGame(chat_id)
             if gameW == None:  # если мы случайно попали в это меню, а объекта с игрой нет
                 menuBot.goto_menu(bot, chat_id, "Выход")
                 return
             gameW.input_letter()
-        elif ms_text == "Загадать слово":
+        elif ms_text == "Другое слово":
             gameW = botGames.newGame(chat_id, botGames.Word_game(bot, chat_id))
             gameW.word_start()
+        elif ms_text == "Правила":
+            info_word = "Правила\n\nБот загадывает слово\n" \
+                        "Игрок должен угадывать его либо, по одной букве, либо все слово сразу\n" \
+                        "Если игрок называет букву, которое есть в слова, она появляется\n" \
+                        "Если нет, то это приближает игрока к казни\n" \
+                        "Есть 8 шансов на ошибку, после чего игра заканчивается."
+            img = open('v.jpeg', 'rb')
+            bot.send_photo(chat_id, img, caption=info_word)
+
+
         # ======================================= модуль ДЗ
         elif ms_text == "Задание-1":
             DZ.dz1(bot, chat_id)

@@ -7,6 +7,7 @@ from telebot import types
 import requests
 from gettext import find
 import bs4
+import menuBot
 
 activeGames = {}
 
@@ -40,28 +41,25 @@ class Word_game:
         self.chat_id = chat_id
         self.word = New_word().get_word()
         self.word_length = len(self.word)
-        self.lives = 3
+        self.lives = 8
         self.used_letters = []
         self.guess_word = ""
 
     def word_start(self):
         self.guess_word = "_" * self.word_length
-        info_word = "Бот загадывает слово\n" \
-                    "Игрок должен угадывать его либо, по одной букве, либо все слово сразу" \
-                    "Если игрок называет букву, которое есть в слова, она появляется" \
-                    "Если нет, то это приближает игрока к казни" \
-                    "Есть 8 шансов на ошибку, после чего игра заканчивается."
         message_word = f'{self.guess_word} - {self.word_length} букв(ы)'
         self.bot.send_message(self.chat_id, text=message_word)
 
+
+
     def input_letter(self):
-        sent = self.bot.send_message(self.chat_id, text="Ведите букву: ")
+        sent = self.bot.send_message(self.chat_id, text="Введите букву: ")
         print(self.word)
         self.bot.register_next_step_handler(sent, self.check_the_letter)
 
 
     def get_letter(self):
-        if self.lives == -1: self.bot.send_message(self.chat_id, f"You lose!!! \nThe word was '{self.word}'")
+        if self.lives == -1: self.bot.send_message(self.chat_id, f"Тебя повесили) \nСлово - '{self.word}'")
         self.lives -= 1
         for i in range(len(self.word)):
             if self.guess_word[i] == '-':
@@ -75,19 +73,18 @@ class Word_game:
                             break
                 break
 
-        text = self.guess_word + "\n " + hearts(self.lives)
-        self.bot.send_message(self.chat_id, text=text)
+
 
     def check_the_letter(self, sent):
         playerChoice = sent.text.upper()
         guess_word = self.guess_word
         word = self.word
         used_letters = self.used_letters
-        print(len(playerChoice))
+
 
         if len(playerChoice) > 1:
             if playerChoice.upper() == word:
-                self.bot.send_message(self.chat_id, "Ты победил!")
+                self.bot.send_message(self.chat_id, f"Ты победил!\nСлово - {word}")
             else:
                 self.bot.send_message(self.chat_id, f"Ты проиграл \nСлово было - '{word}'")
         elif len(playerChoice) == 1:
@@ -99,15 +96,23 @@ class Word_game:
                         guess_word = guess_word[:index] + playerChoice + guess_word[index + 1:]
                 self.guess_word = guess_word
 
-                self.used_letters.append(playerChoice)
-                self.bot.send_message(self.chat_id, text=f'{guess_word}\n{used_letters}')
+                if playerChoice.upper() not in used_letters:
+                    self.used_letters.append(playerChoice)
+                if guess_word == word:
+                    self.bot.send_message(self.chat_id, f"Ты победил!\nСлово - {word}")
+                else:
+                    text = f"Использованные буквы: {self.used_letters}\n\n{guess_word} " \
+                           f"- {self.word_length} букв(ы)\n\nЖизней осталось: {self.lives}"
+                    self.bot.send_message(self.chat_id, text=text)
             else:
                 self.lives -= 1
                 if self.lives < 0:
-                    self.bot.send_message(self.chat_id, f"You lose!!!\n{word}")
-                    # restart_game()
+                    self.bot.send_message(self.chat_id, f"Тебя повесили)\nСлово - {word}")
+                    menuBot.goto_menu(self.bot, self.chat_id, "Выход")
+
                 else:
-                    self.used_letters.append(playerChoice)
+                    if playerChoice.upper() not in used_letters:
+                        self.used_letters.append(playerChoice)
                     text = f"Буквы {playerChoice.upper()} нет в слове\nИспользованные буквы: {self.used_letters}\n\n{guess_word} " \
                            f"- {self.word_length} букв(ы)\n\nЖизней осталось: {self.lives}"
                     self.bot.send_message(self.chat_id, text=text)
